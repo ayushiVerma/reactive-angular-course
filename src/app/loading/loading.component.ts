@@ -11,7 +11,7 @@ export class LoadingComponent implements OnInit {
 
 
   constructor(
-    private loadingService: LoadingService
+    public loadingService: LoadingService
   ) {
 
   }
