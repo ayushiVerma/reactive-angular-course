@@ -7,6 +7,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {CourseDialogComponent} from '../course-dialog/course-dialog.component';
 import { CoursesService } from '../services/courses.service';
 import { LoadingService } from '../loading/loading.service';
+import { MessageService } from '../messages/messages.service';
 
 
 @Component({
@@ -28,7 +29,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private loadingService:LoadingService,
-    private coursesService: CoursesService
+    private coursesService: CoursesService,
+    private messageService: MessageService
     ) {
   }
 
@@ -38,11 +40,23 @@ export class HomeComponent implements OnInit {
 
   reloadCourses(){
     // this.loadingService.loadingOn();
-    const course$ = this.coursesService.loadCousrse().pipe(
-      map(c => c.sort(sortCoursesBySeqNo))
-      // ,finalize(()=>{
-      //   this.loadingService.loadingOff();
-      // })
+    // const course$ = this.coursesService.loadCousrse().pipe(
+    //   map(c => c.sort(sortCoursesBySeqNo))
+    //   // ,finalize(()=>{
+    //   //   this.loadingService.loadingOff();
+    //   // })
+    // );
+
+    const course$ = this.coursesService.loadCousrse().
+    pipe(
+      map(c => c.sort(sortCoursesBySeqNo)),
+      catchError(err => {
+        const errorMessage = 'error while loading cousers';
+        this.messageService.showErros(errorMessage);
+        console.error(errorMessage, err);
+        return throwError(err);
+      })
+      
     );
 
     const loadCousrse$ = this.loadingService.showLoaderUntilCompleted(course$);
